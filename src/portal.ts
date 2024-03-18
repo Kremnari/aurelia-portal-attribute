@@ -16,7 +16,7 @@ type PortalTarget = string | Element | null | undefined
 /**
  * Indicates where to insert a portalled view. Aligns with webapi for insertion
  */
-type InsertPosition = 'beforebegin' | 'afterbegin' | 'beforeend' | 'afterend';
+type InsertPosition = 'beforebegin' | 'afterbegin' | 'beforeend' | 'afterend' | 'replace_all';
 
 export type PortalLifecycleCallback = (target: Element, view: View) => Promise<any> | any;
 
@@ -24,7 +24,8 @@ const validPositions = {
   beforebegin: 1,
   afterbegin: 1,
   beforeend: 1,
-  afterend: 1
+  afterend: 1,
+  replace_all: 1
 };
 
 @templateController()
@@ -60,7 +61,11 @@ export class Portal {
     }
     const anchorCommentHolder = document.createElement('portal-placeholder');
     const normalizedPosition = position.toLowerCase() as InsertPosition;
-    target.insertAdjacentElement(normalizedPosition, anchorCommentHolder);
+    if (normalizedPosition == 'replace_all') {
+      target.innerHTML = anchorCommentHolder
+    } else {
+      target.insertAdjacentElement(normalizedPosition, anchorCommentHolder);
+    }
     const anchorComment = document.createComment('portal');
     // If the position is beforeBegin or aftrEnd,
     // then anchorCommentHolder wont be a child of target
